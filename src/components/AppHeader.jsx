@@ -14,7 +14,7 @@ export default function AppHeader() {
     <header className="app-header">
       <Link to="/choice" className="app-brand">Credora</Link>
       <div className="app-header-right">
-        {user && <span className="app-username">{user.username}</span>}
+        {user && <span className="app-username">{user.email}</span>}
         <button className="btn-link" onClick={handleLogout}>Log out</button>
       </div>
     </header>

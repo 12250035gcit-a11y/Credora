@@ -1,0 +1,21 @@
+package com.credora.backend.user;
+
+/** Sent back to the frontend after a successful login/signup. */
+public class AuthResponse {
+
+    private final String token;
+    private final String email;
+
+    public AuthResponse(String token, String email) {
+        this.token = token;
+        this.email = email;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+}

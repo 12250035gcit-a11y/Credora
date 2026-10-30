@@ -1,15 +1,60 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCv } from '../CvContext'
+import { DropdownMultiSelect, DropdownSelect } from '../components/Dropdown'
+
+const LOCATION_OPTIONS = [
+  'Thimphu', 'Phuentsholing', 'Paro', 'Punakha', 'Gelephu', 'Samdrup Jongkhar', 'Mongar', 'Trashigang',
+]
+
+const LANGUAGE_OPTIONS = ['English', 'Dzongkha', 'Hindi', 'Nepali', 'Sharchop', 'Mandarin']
+
+const SKILL_OPTIONS = [
+  'Communication', 'Teamwork', 'Problem Solving', 'Leadership', 'Project Management',
+  'Microsoft Office', 'JavaScript', 'React', 'Python', 'SQL', 'Git', 'Figma',
+]
+
+function parseList(value) {
+  return value.split(',').map((v) => v.trim()).filter(Boolean)
+}
 
 export default function CvForm() {
   const { cv, setCv } = useCv()
   const navigate = useNavigate()
+
+  const [locationIsOther, setLocationIsOther] = useState(
+    () => !!cv.location && !LOCATION_OPTIONS.includes(cv.location)
+  )
+  const [customLanguages, setCustomLanguages] = useState(
+    () => parseList(cv.languages).filter((l) => !LANGUAGE_OPTIONS.includes(l)).join(', ')
+  )
+  const [customSkills, setCustomSkills] = useState(
+    () => parseList(cv.skills).filter((s) => !SKILL_OPTIONS.includes(s)).join(', ')
+  )
 
   function update(field) {
     return (e) => {
       const { value } = e.target
       setCv((prev) => ({ ...prev, [field]: value }))
     }
+  }
+
+  function toggleListValue(field, options, value) {
+    setCv((prev) => {
+      const current = parseList(prev[field])
+      const next = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value]
+      return { ...prev, [field]: next.join(', ') }
+    })
+  }
+
+  function updateCustomList(field, options, customValue, setCustomValue) {
+    setCustomValue(customValue)
+    setCv((prev) => {
+      const preset = parseList(prev[field]).filter((v) => options.includes(v))
+      return { ...prev, [field]: [...preset, ...parseList(customValue)].join(', ') }
+    })
   }
 
   function handleSubmit(e) {
@@ -95,11 +140,33 @@ export default function CvForm() {
         </label>
         <label>
           Location
-          <input value={cv.location} onChange={update('location')} placeholder="City, Country" />
+          <DropdownSelect
+            options={LOCATION_OPTIONS}
+            value={cv.location}
+            isOther={locationIsOther}
+            placeholder="Select a location"
+            onSelect={(val) => {
+              if (val === 'Other') {
+                setLocationIsOther(true)
+                setCv((prev) => ({ ...prev, location: '' }))
+              } else {
+                setLocationIsOther(false)
+                setCv((prev) => ({ ...prev, location: val }))
+              }
+            }}
+            onOtherText={update('location')}
+          />
         </label>
         <label>
-          Languages (comma separated)
-          <input value={cv.languages} onChange={update('languages')} placeholder="English, Dzongkha" />
+          Languages
+          <DropdownMultiSelect
+            options={LANGUAGE_OPTIONS}
+            selected={parseList(cv.languages)}
+            placeholder="Select languages"
+            onToggle={(lang) => toggleListValue('languages', LANGUAGE_OPTIONS, lang)}
+            customValue={customLanguages}
+            onCustomChange={(e) => updateCustomList('languages', LANGUAGE_OPTIONS, e.target.value, setCustomLanguages)}
+          />
         </label>
         <label>
           LinkedIn
@@ -131,8 +198,15 @@ export default function CvForm() {
           />
         </label>
         <label className="full">
-          Skills (comma separated)
-          <input value={cv.skills} onChange={update('skills')} placeholder="React, JavaScript, CSS" />
+          Skills
+          <DropdownMultiSelect
+            options={SKILL_OPTIONS}
+            selected={parseList(cv.skills)}
+            placeholder="Select skills"
+            onToggle={(skill) => toggleListValue('skills', SKILL_OPTIONS, skill)}
+            customValue={customSkills}
+            onCustomChange={(e) => updateCustomList('skills', SKILL_OPTIONS, e.target.value, setCustomSkills)}
+          />
         </label>
         <label className="full">
           Certificates & Training (one per line)

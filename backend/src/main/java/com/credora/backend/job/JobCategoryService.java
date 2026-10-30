@@ -1,0 +1,46 @@
+package com.credora.backend.job;
+
+import java.util.List;
+import org.springframework.stereotype.Service;
+
+/**
+ * Builds the career-category TREE (slide: "Career Categories -> Tree -> Traversal").
+ *
+ * The categories table is self-referencing (each row points at its parent),
+ * so turning it into the nested JSON the frontend wants is a classic
+ * depth-first tree traversal: visit a category, list the jobs that belong to
+ * it directly, then recurse into each child category.
+ */
+@Service
+public class JobCategoryService {
+
+    private final JobCategoryRepository categoryRepository;
+    private final JobRepository jobRepository;
+
+    public JobCategoryService(JobCategoryRepository categoryRepository, JobRepository jobRepository) {
+        this.categoryRepository = categoryRepository;
+        this.jobRepository = jobRepository;
+    }
+
+    /** Returns every root category as a fully expanded tree. */
+    public List<CategoryNode> getTree() {
+        return categoryRepository.findByParentIsNull().stream()
+                .map(this::buildNode)
+                .toList();
+    }
+
+    /** Depth-first traversal: node, then its jobs, then each child subtree. */
+    private CategoryNode buildNode(JobCategory category) {
+        CategoryNode node = new CategoryNode(category.getId(), category.getName());
+
+        for (Job job : jobRepository.findByCategory(category)) {
+            node.getJobs().add(new JobSummary(job));
+        }
+
+        for (JobCategory child : categoryRepository.findByParent(category)) {
+            node.getChildren().add(buildNode(child));
+        }
+
+        return node;
+    }
+}

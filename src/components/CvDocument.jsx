@@ -1,3 +1,5 @@
+import { forwardRef } from 'react'
+
 function ListSection({ title, items, emptyText, className = 'chip-list', itemClassName = 'chip' }) {
   return (
     <section>
@@ -24,7 +26,7 @@ function TextSection({ title, text, emptyText }) {
   )
 }
 
-export default function CvDocument({ cv, template }) {
+function CvDocument({ cv, template }, ref) {
   const skills = cv.skills.split(',').map((s) => s.trim()).filter(Boolean)
   const languages = cv.languages.split(',').map((l) => l.trim()).filter(Boolean)
   const certificates = cv.certificates.split('\n').map((c) => c.trim()).filter(Boolean)
@@ -32,7 +34,7 @@ export default function CvDocument({ cv, template }) {
   const linkLines = [cv.linkedin, cv.portfolio].filter(Boolean)
 
   return (
-    <div className={`cv-preview template-${template}`}>
+    <div ref={ref} className={`cv-preview template-${template}`}>
       <header className="cv-header">
         {cv.photo && <img src={cv.photo} alt={cv.name || 'Profile'} className="cv-photo" />}
         <div>
@@ -93,3 +95,5 @@ export default function CvDocument({ cv, template }) {
     </div>
   )
 }
+
+export default forwardRef(CvDocument)

@@ -26,7 +26,7 @@ export function CvProvider({ children }) {
   const [template, setTemplate] = useState('modern')
   const [cv, setCv] = useState(emptyCv)
 
-  const login = (username) => setUser({ username })
+  const login = (email, token) => setUser({ email, token })
   const logout = () => {
     setUser(null)
     setTemplate('modern')

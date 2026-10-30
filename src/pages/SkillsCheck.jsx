@@ -4,8 +4,15 @@ import { useCv } from '../CvContext'
 
 const JOB_SKILLS = {
   'Frontend Developer': ['HTML', 'CSS', 'JavaScript', 'React', 'Git'],
+  'Backend Developer': ['Java', 'Spring Boot', 'SQL', 'REST APIs', 'Docker'],
+  'Full Stack Developer': ['JavaScript', 'React', 'Node.js', 'SQL', 'Git'],
   'Data Analyst': ['SQL', 'Excel', 'Python', 'Statistics', 'Data Visualization'],
+  'Data Scientist': ['Python', 'Machine Learning', 'Statistics', 'SQL', 'Data Visualization'],
+  'UI/UX Designer': ['Figma', 'Wireframing', 'User Research', 'Prototyping', 'Typography'],
+  'DevOps Engineer': ['Docker', 'Kubernetes', 'CI/CD', 'Linux', 'AWS'],
   'Project Manager': ['Communication', 'Agile', 'Risk Management', 'Budgeting'],
+  'Product Manager': ['Roadmapping', 'Stakeholder Management', 'Agile', 'Communication', 'Market Research'],
+  'Marketing Specialist': ['SEO', 'Content Strategy', 'Social Media', 'Analytics', 'Copywriting'],
 }
 
 export default function SkillsCheck() {

@@ -2,6 +2,18 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCv } from '../CvContext'
 
+const API_BASE = 'http://localhost:8080'
+
+const PASSWORD_HINT = 'At least 8 characters, with an uppercase letter, a lowercase letter, a number, and a special character.'
+
+function isStrongPassword(value) {
+  return value.length >= 8
+    && /[a-z]/.test(value)
+    && /[A-Z]/.test(value)
+    && /\d/.test(value)
+    && /[^A-Za-z0-9]/.test(value)
+}
+
 const eyeCommon = { width: 18, height: 18, viewBox: '0 0 20 20', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }
 
 function EyeIcon() {
@@ -25,9 +37,7 @@ function EyeOffIcon() {
 
 export default function Login() {
   const [mode, setMode] = useState('login')
-  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -42,17 +52,17 @@ export default function Login() {
     setConfirmPassword('')
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
 
-    if (!username.trim() || password.trim().length < 4) {
-      setError('Wrong information. Please check your username and password (min 4 characters).')
+    if (!email.trim() || !email.includes('@') || !password.trim()) {
+      setError('Wrong information. Please check your email and password.')
       return
     }
 
     if (mode === 'signup') {
-      if (!email.trim() || !email.includes('@')) {
-        setError('Please enter a valid email address.')
+      if (!isStrongPassword(password)) {
+        setError(`Password is too weak. ${PASSWORD_HINT}`)
         return
       }
       if (password !== confirmPassword) {
@@ -62,8 +72,28 @@ export default function Login() {
     }
 
     setError('')
-    login(username.trim())
-    navigate('/choice')
+
+    const endpoint = mode === 'signup' ? '/api/auth/signup' : '/api/auth/login'
+    const body = { email: email.trim(), password }
+
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.message || 'Something went wrong. Please try again.')
+        return
+      }
+
+      login(data.email, data.token)
+      navigate('/choice')
+    } catch {
+      setError('Could not reach the server. Is the backend running?')
+    }
   }
 
   return (
@@ -74,32 +104,14 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="form" noValidate>
           <label>
-            Username
-            <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="jamtsho" />
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="jamtshokayakay13@gmail.com"
+            />
           </label>
-
-          {mode === 'signup' && (
-            <>
-              <label>
-                Email
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="jamtshokayakay13@gmail.com"
-                />
-              </label>
-              <label>
-                Phone Number
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="17652719"
-                />
-              </label>
-            </>
-          )}
 
           <label>
             Password
@@ -119,6 +131,7 @@ export default function Login() {
                 {showPassword ? <EyeOffIcon /> : <EyeIcon />}
               </button>
             </div>
+            {mode === 'signup' && <p className="field-hint">{PASSWORD_HINT}</p>}
           </label>
 
           {mode === 'signup' && (
