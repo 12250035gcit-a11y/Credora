@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCv } from '../CvContext'
-
-const API_BASE = 'http://localhost:8080'
+import { apiPost } from '../api'
 
 const PASSWORD_HINT = 'At least 8 characters, with an uppercase letter, a lowercase letter, a number, and a special character.'
 
@@ -77,22 +76,11 @@ export default function Login() {
     const body = { email: email.trim(), password }
 
     try {
-      const res = await fetch(`${API_BASE}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.message || 'Something went wrong. Please try again.')
-        return
-      }
-
-      login(data.email, data.token)
+      const data = await apiPost(endpoint, null, body)
+      await login(data.email, data.token)
       navigate('/choice')
-    } catch {
-      setError('Could not reach the server. Is the backend running?')
+    } catch (err) {
+      setError(err.message)
     }
   }
 

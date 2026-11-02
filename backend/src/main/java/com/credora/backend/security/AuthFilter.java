@@ -30,7 +30,10 @@ public class AuthFilter extends OncePerRequestFilter {
         boolean isPublicJobGet = "GET".equalsIgnoreCase(request.getMethod())
                 && (path.equals("/api/jobs") || path.equals("/api/jobs/categories"));
 
-        return path.startsWith("/api/auth")
+        // CORS preflight requests never carry the Authorization header - let them
+        // through so Spring's CORS handling can answer, instead of rejecting them here.
+        return "OPTIONS".equalsIgnoreCase(request.getMethod())
+                || path.startsWith("/api/auth")
                 || path.equals("/api/templates")
                 || isPublicJobGet;
     }

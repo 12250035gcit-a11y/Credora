@@ -19,8 +19,10 @@ function parseList(value) {
 }
 
 export default function CvForm() {
-  const { cv, setCv } = useCv()
+  const { cv, setCv, saveCv } = useCv()
   const navigate = useNavigate()
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   const [locationIsOther, setLocationIsOther] = useState(
     () => !!cv.location && !LOCATION_OPTIONS.includes(cv.location)
@@ -57,9 +59,18 @@ export default function CvForm() {
     })
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    navigate('/preview')
+    setSaveError('')
+    setSaving(true)
+    try {
+      await saveCv()
+      navigate('/preview')
+    } catch (err) {
+      setSaveError(err.message)
+    } finally {
+      setSaving(false)
+    }
   }
 
   function handlePhoto(e) {
@@ -236,9 +247,11 @@ export default function CvForm() {
           </div>
         )}
 
+        {saveError && <p className="error full">{saveError}</p>}
+
         <div className="full actions">
-          <button type="submit" className="btn btn-primary">
-            Preview CV
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? 'Saving…' : 'Preview CV'}
           </button>
         </div>
       </form>

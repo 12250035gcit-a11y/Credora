@@ -6,15 +6,20 @@ import { useCv } from '../CvContext'
 import CvDocument from '../components/CvDocument'
 
 export default function Done() {
-  const { cv, template } = useCv()
+  const { cv, template, saveCv } = useCv()
   const navigate = useNavigate()
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [downloading, setDownloading] = useState(false)
   const cvRef = useRef(null)
 
   useEffect(() => {
-    const timer = setTimeout(() => setSaved(true), 600)
-    return () => clearTimeout(timer)
+    let active = true
+    saveCv()
+      .catch((err) => { if (active) setSaveError(err.message) })
+      .finally(() => { if (active) setSaved(true) })
+    return () => { active = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function handleDownload() {
@@ -66,7 +71,11 @@ export default function Done() {
   return (
     <div className="page">
       <h1>All Set!</h1>
-      <p className="subtitle">Your CV has been saved. Here's the final result.</p>
+      {saveError ? (
+        <p className="error">Could not save to the server: {saveError} Your download below will still work from this device.</p>
+      ) : (
+        <p className="subtitle">Your CV has been saved. Here's the final result.</p>
+      )}
 
       <CvDocument ref={cvRef} cv={cv} template={template} />
 
