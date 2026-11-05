@@ -1,7 +1,6 @@
 package com.credora.backend.request;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import com.credora.backend.ds.MyQueue;
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,9 +8,10 @@ import org.springframework.stereotype.Service;
  * in order" from the slide's feature table.
  *
  * Every write (save CV, undo, etc.) is wrapped in a task and placed on a FIFO
- * queue instead of being executed directly. processAll() then dequeues and
- * runs them strictly in arrival order - first in, first out - which is the
- * guarantee a queue gives you and a plain method call does not make explicit.
+ * queue (hand-written in {@link MyQueue}, not java.util.Queue) instead of
+ * being executed directly. processAll() then dequeues and runs them strictly
+ * in arrival order - first in, first out - which is the guarantee a queue
+ * gives you and a plain method call does not make explicit.
  *
  * This is deliberately synchronous (processAll runs on the caller's thread):
  * easy to follow and to grade. A production system would instead have a
@@ -21,16 +21,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class RequestQueueService {
 
-    private final Queue<Runnable> pendingRequests = new ArrayDeque<>();
+    private final MyQueue<Runnable> pendingRequests = new MyQueue<>();
 
     public synchronized void enqueue(Runnable task) {
-        pendingRequests.add(task);
+        pendingRequests.enqueue(task);
     }
 
     /** Dequeues and runs every pending task, oldest first. */
     public synchronized void processAll() {
         while (!pendingRequests.isEmpty()) {
-            Runnable task = pendingRequests.poll();
+            Runnable task = pendingRequests.dequeue();
             task.run();
         }
     }
