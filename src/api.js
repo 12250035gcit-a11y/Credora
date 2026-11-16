@@ -1,4 +1,4 @@
-export const API_BASE = 'http://localhost:8080'
+export const API_BASE = 'http://localhost:8081'
 
 async function request(path, { method = 'GET', token, body } = {}) {
   let res
