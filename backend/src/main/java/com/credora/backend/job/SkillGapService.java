@@ -1,6 +1,6 @@
 package com.credora.backend.job;
 
-import com.credora.backend.ds.MyList;
+import com.credora.backend.ds.DynamicArray;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
  * skills" from the slide's feature table.
  *
  * The CV stores skills as one comma-separated string (e.g. "HTML, CSS, React").
- * Here it is split into a hand-written {@link MyList}, then each required
+ * Here it is split into a hand-written {@link DynamicArray}, then each required
  * skill for a job is looked up in that list with a plain linear search
  * (case-insensitive string comparison) - no database and no java.util.List
  * involved, this is pure in-memory comparison over our own list structure.
@@ -20,11 +20,11 @@ import org.springframework.stereotype.Service;
 public class SkillGapService {
 
     public SkillGapResult compare(Job job, String cvSkillsCsv) {
-        MyList<String> ownedSkills = splitSkills(cvSkillsCsv);
+        DynamicArray<String> ownedSkills = splitSkills(cvSkillsCsv);
         List<String> required = job.getRequiredSkills();
 
-        MyList<String> matched = new MyList<>();
-        MyList<String> missing = new MyList<>();
+        DynamicArray<String> matched = new DynamicArray<>();
+        DynamicArray<String> missing = new DynamicArray<>();
 
         for (String requiredSkill : required) {
             if (containsIgnoreCase(ownedSkills, requiredSkill)) {
@@ -38,7 +38,7 @@ public class SkillGapService {
     }
 
     /** Linear search: walk the list comparing each entry, ignoring case/whitespace. */
-    private boolean containsIgnoreCase(MyList<String> ownedSkills, String target) {
+    private boolean containsIgnoreCase(DynamicArray<String> ownedSkills, String target) {
         for (String owned : ownedSkills) {
             if (owned.equalsIgnoreCase(target.trim())) {
                 return true;
@@ -47,8 +47,8 @@ public class SkillGapService {
         return false;
     }
 
-    private MyList<String> splitSkills(String csv) {
-        MyList<String> result = new MyList<>();
+    private DynamicArray<String> splitSkills(String csv) {
+        DynamicArray<String> result = new DynamicArray<>();
         if (csv == null || csv.isBlank()) {
             return result;
         }

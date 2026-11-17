@@ -5,7 +5,7 @@ package com.credora.backend.ds;
  * singly linked list of entries) - no java.util.Map/HashMap involved.
  * Not thread-safe by itself; callers that need that must synchronize.
  */
-public class MyMap<K, V> {
+public class HashTable<K, V> {
 
     private static class Entry<K, V> {
         private final K key;
@@ -26,7 +26,7 @@ public class MyMap<K, V> {
     private int size;
 
     @SuppressWarnings("unchecked")
-    public MyMap() {
+    public HashTable() {
         buckets = (Entry<K, V>[]) new Entry[DEFAULT_CAPACITY];
     }
 

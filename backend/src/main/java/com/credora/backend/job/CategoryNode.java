@@ -1,12 +1,12 @@
 package com.credora.backend.job;
 
-import com.credora.backend.ds.MyList;
+import com.credora.backend.ds.DynamicArray;
 import java.util.List;
 
 /**
  * One node of the career-category TREE sent to the frontend: its own jobs
  * plus its child categories, built by a recursive (depth-first) traversal
- * in JobCategoryService. Storage is the hand-written {@link MyList}, not
+ * in JobCategoryService. Storage is the hand-written {@link DynamicArray}, not
  * java.util.ArrayList - converted to java.util.List only in the getters,
  * where Spring/Jackson needs it to serialize the HTTP response.
  */
@@ -14,8 +14,8 @@ public class CategoryNode {
 
     private final Long id;
     private final String name;
-    private final MyList<JobSummary> jobs = new MyList<>();
-    private final MyList<CategoryNode> children = new MyList<>();
+    private final DynamicArray<JobSummary> jobs = new DynamicArray<>();
+    private final DynamicArray<CategoryNode> children = new DynamicArray<>();
 
     public CategoryNode(Long id, String name) {
         this.id = id;

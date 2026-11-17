@@ -1,6 +1,6 @@
 package com.credora.backend.request;
 
-import com.credora.backend.ds.MyQueue;
+import com.credora.backend.ds.LinkedQueue;
 import org.springframework.stereotype.Service;
 
 /**
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
  * in order" from the slide's feature table.
  *
  * Every write (save CV, undo, etc.) is wrapped in a task and placed on a FIFO
- * queue (hand-written in {@link MyQueue}, not java.util.Queue) instead of
+ * queue (hand-written in {@link LinkedQueue}, not java.util.Queue) instead of
  * being executed directly. processAll() then dequeues and runs them strictly
  * in arrival order - first in, first out - which is the guarantee a queue
  * gives you and a plain method call does not make explicit.
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RequestQueueService {
 
-    private final MyQueue<Runnable> pendingRequests = new MyQueue<>();
+    private final LinkedQueue<Runnable> pendingRequests = new LinkedQueue<>();
 
     public synchronized void enqueue(Runnable task) {
         pendingRequests.enqueue(task);

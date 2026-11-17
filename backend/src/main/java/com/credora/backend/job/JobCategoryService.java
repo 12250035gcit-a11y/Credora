@@ -1,6 +1,6 @@
 package com.credora.backend.job;
 
-import com.credora.backend.ds.MyList;
+import com.credora.backend.ds.DynamicArray;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * so turning it into the nested JSON the frontend wants is a classic
  * depth-first tree traversal: visit a category, list the jobs that belong to
  * it directly, then recurse into each child category. The roots are
- * collected in a hand-written {@link MyList}, not java.util.ArrayList, and
+ * collected in a hand-written {@link DynamicArray}, not java.util.ArrayList, and
  * only converted to java.util.List at the very end, where Spring needs it
  * to serialize the HTTP response.
  */
@@ -28,7 +28,7 @@ public class JobCategoryService {
 
     /** Returns every root category as a fully expanded tree. */
     public List<CategoryNode> getTree() {
-        MyList<CategoryNode> roots = new MyList<>();
+        DynamicArray<CategoryNode> roots = new DynamicArray<>();
         for (JobCategory root : categoryRepository.findByParentIsNull()) {
             roots.add(buildNode(root));
         }

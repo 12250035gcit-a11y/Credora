@@ -6,7 +6,7 @@ package com.credora.backend.ds;
  * and tail pointers so both operations are O(1) - no java.util.Queue
  * involved.
  */
-public class MyQueue<T> {
+public class LinkedQueue<T> {
 
     private static class Node<T> {
         private final T value;

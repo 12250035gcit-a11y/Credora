@@ -5,7 +5,7 @@ package com.credora.backend.ds;
  * feature table), backed by its own singly linked nodes - no java.util.Deque
  * involved.
  */
-public class MyStack<T> {
+public class LinkedStack<T> {
 
     private static class Node<T> {
         private final T value;

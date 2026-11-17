@@ -1,6 +1,6 @@
 package com.credora.backend.job;
 
-import com.credora.backend.ds.MyList;
+import com.credora.backend.ds.DynamicArray;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  *
  * Step 1 (Comparison): for every job, reuse SkillGapService's linear search to
  * count how many of its required skills the user already has.
- * Step 2 (Sorting): put every result in a hand-written {@link MyList} and
+ * Step 2 (Sorting): put every result in a hand-written {@link DynamicArray} and
  * rank it best-first with a hand-written insertion sort, so the algorithm
  * and the list it operates on are both visible in code instead of being
  * hidden behind java.util.ArrayList and a one-line Collections.sort call.
@@ -29,7 +29,7 @@ public class JobMatchService {
     }
 
     public List<JobMatchResult> rankJobsBySkillMatch(String cvSkillsCsv) {
-        MyList<JobMatchResult> results = new MyList<>();
+        DynamicArray<JobMatchResult> results = new DynamicArray<>();
 
         for (Job job : jobRepository.findAll()) {
             SkillGapResult gap = skillGapService.compare(job, cvSkillsCsv);
@@ -49,7 +49,7 @@ public class JobMatchService {
      * element currently being inserted. O(n^2), easy to read, more than fast
      * enough for a handful of job listings.
      */
-    private void insertionSortByScoreDescending(MyList<JobMatchResult> results) {
+    private void insertionSortByScoreDescending(DynamicArray<JobMatchResult> results) {
         for (int i = 1; i < results.size(); i++) {
             JobMatchResult current = results.get(i);
             int j = i - 1;
